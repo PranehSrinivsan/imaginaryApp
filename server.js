@@ -3,7 +3,7 @@ var app = express();
 
 app.get('/api.github.com', function (req, res) {
    var XMLHttpRequest = require('xhr2');
-   var xhr = new XMLHttpRequest();
+   var xhr = require('http')
    const url=`https://api.github.com`;
    xhr.open('GET', url, true);
    xhr.onload = function () {
@@ -25,11 +25,15 @@ app.get('/api.github.com/repos', function (req, res) {
    xhr.send();
 })
 
-app.get('/api.github.com/repos/owner', function(req, res) {
+app.get('/api.github.com/repos/:owner/:reponame', function(req, res) {
    
    var XMLHttpRequest = require('xhr2');
    var xhr = new XMLHttpRequest();
-   const url=`https://api.github.com/repos/arunnatarajs/toDoApp`;
+   var username = req.params.owner;
+   var repo = req.params.reponame;
+  // console.log(username);
+   //console.log(repo);
+   const url=`https://api.github.com/repos/${username}/${repo}`;
    xhr.open('GET', url, true);
    xhr.onload = function () {
       const data = JSON.parse(this.response);
@@ -38,21 +42,20 @@ app.get('/api.github.com/repos/owner', function(req, res) {
    xhr.send();
 })
 
-app.get('/api.github.com/repos/owner/commits', function (req, res) {
-   var XMLHttpRequest = require('xhr2');
-   var xhr = new XMLHttpRequest();
-   const url=`https://api.github.com/repos/arunnatarajs/toDoApp/commits`;
-   xhr.open('GET', url, true);
-   xhr.onload = function () {
-      const cdata = JSON.parse(this.response);
-      res.send(cdata);
-   }
-   xhr.send();
-})
-
-var server = app.listen(8081, function () {
-   var host = server.address().address
-   var port = server.address().port
+app.get('/api.github.com/repos/:owner/:reponame/:commit/:sha', function(req, res) {
    
-   console.log("Example app listening at http://%s:%s", host, port)
-})
+    var XMLHttpRequest = require('xhr2');
+    var xhr = new XMLHttpRequest();
+    var username = req.params.owner;
+    var repo = req.params.reponame;
+    var commitId = req.params.commit;
+    var Sha = req.params.sha;
+    const url=`https://api.github.com/repos/${username}/${repo}/${commitId}/${Sha}`;
+    xhr.open('GET', url, true);
+    xhr.onload = function () {
+       const data = JSON.parse(this.response);
+       res.send(data);
+    }
+    xhr.send();
+ })
+app.listen(8000);
