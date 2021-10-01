@@ -39,13 +39,14 @@ app.get('/repos/:username/:reponame/commits/:sha', function(req, res) {
       const data = JSON.parse(this.response);
       var dxhr = new XMLHttpRequest();
       var psha = data.parents[0].sha;//parent sha
-      const durl=`https://api.github.com/repos/${username}/${repo}/compare/${oid}...${psha}`;//parent url
+      //const durl=`https://api.github.com/repos/${username}/${repo}/compare/${oid}...${psha}`;//parent url
+      const durl=`https://github.com/${username}/${repo}/compare/${psha}...${oid}.diff`;
       dxhr.open('GET', durl, true);
 
       dxhr.onload = function () {
          
-         const dat = JSON.parse(this.response);
-         res.send(dat);
+         //const dat = JSON.parse(this.response);
+         res.send(this.response);
       }
       dxhr.send();
    }
