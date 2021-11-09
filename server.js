@@ -1,55 +1,52 @@
+const { default: axios } = require('axios');
 var express = require('express');
 var app = express();
 
 //get commits
 app.get('/repos/:username/:reponame/commits/:sha', function(req, res) {
-
-   var XMLHttpRequest = require('xhr2');
-   var xhr = new XMLHttpRequest();
    var owner = req.params.username;
    var repo = req.params.reponame;
    var oid = req.params.sha;
 
-   const curl=`https://api.github.com/repos/${owner}/${repo}/commits/${oid}`;
+   const curl=`https://api.github.com/repos/${owner}/${repo}/commits/${oid}`;//commit url
 
-   xhr.open('GET', curl, true);
-
-   xhr.onload = function () {
-      res.send(this.response);
-   }
-   xhr.send();
+   axios.get(curl)
+   .then((response)=>{
+      res.json(response.data);
+   })
+   .catch((e)=>{
+      res.send("Error")
+   })
 
 })
 
 //get diff
  app.get('/repos/:username/:reponame/commits/:sha/diff', function(req, res) {
    
-   var XMLHttpRequest = require('xhr2');
-   var xhr = new XMLHttpRequest();
    var username = req.params.username;
    var repo = req.params.reponame;
    var oid = req.params.sha;
 
-   const curl=`https://api.github.com/repos/${username}/${repo}/commits/${oid}`;
+   const curl=`https://api.github.com/repos/${username}/${repo}/commits/${oid}`;//commit url
 
-   xhr.open('GET', curl, true);
+   axios.get(curl)
+   .then((response)=>{
 
-   xhr.onload = function () {
-
-      const data = JSON.parse(this.response);
-      var dxhr = new XMLHttpRequest();
-      var psha = data.parents[0].sha;//parent sha
+      var psha = response.data.parents[0].sha;//parent sha
       
-      const durl=`https://github.com/${username}/${repo}/compare/${psha}...${oid}.diff`;
-      dxhr.open('GET', durl, true);
-
-      dxhr.onload = function () {
-         res.send(this.response);
-      }
-      dxhr.send();
-   }
-   xhr.send();
-
+      const durl=`https://github.com/${username}/${repo}/compare/${psha}...${oid}.diff`;//diff url
+      
+      axios.get(durl)
+      .then((response)=> {
+         res.json(response.data);
+      })
+      .catch((e)=>{
+         res.send("Error")
+      })
+   })
+   .catch((e)=>{
+      res.send("Error")
+   })
 })
 
 app.listen(8081);
