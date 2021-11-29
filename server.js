@@ -7,6 +7,7 @@ app.use(cors())
 
 //get commits
 app.get('/repos/:username/:reponame/commits/:sha', (req, res) => {
+
    var owner = req.params.username;
    var repo = req.params.reponame;
    var oid = req.params.sha;
@@ -14,12 +15,8 @@ app.get('/repos/:username/:reponame/commits/:sha', (req, res) => {
    const curl=`https://api.github.com/repos/${owner}/${repo}/commits/${oid}`;//commit url
 
    axios.get(curl)
-   .then((response)=>{
-      res.json(response.data);
-   })
-   .catch((e)=>{
-      res.send("Error")
-   })
+   .then((response)=> res.json(response.data))
+   .catch((e)=> res.send("Error"))
 
 })
 
@@ -28,18 +25,15 @@ app.get('/repos/:username/:reponame/commits/:sha', (req, res) => {
    
    var username = req.params.username;
    var repo = req.params.reponame;
-   var psha = req.params.parentsha
+   var psha = req.params.parentsha;
    var oid = req.params.sha;
-   
-   const durl=`https://github.com/${username}/${repo}/compare/${psha}...${oid}.diff`;//diff url
+
+   const durl=`https://api.github.com/repos/${username}/${repo}/compare/${psha}...${oid}`;//diff url
       
    axios.get(durl)
-   .then((response)=> {
-      res.json(response.data);
-   })
-   .catch((e)=>{
-      res.send("Error")
-   })
+   .then((response)=> res.json(response.data))
+   .catch((e)=> res.send("Error"))
+   
 })
 
 app.listen(8081,()=>{

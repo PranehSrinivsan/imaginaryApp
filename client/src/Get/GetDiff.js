@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router';
-
+import { display } from '../commponents/Display';
 function GetDiff(){
 
     const {owner,repository,oid}=useParams();
@@ -31,15 +31,13 @@ function GetDiff(){
             setAuthorphoto(json.data.author.avatar_url);
 
             // const durl = `https://api.github.com/repos/${owner}/${repository}/compare/${psha}...${oid}`;
-            const durl = `/repos/${owner}/${repository}/commits/${psha}/${oid}/diff`;
-            
+            const durl = `/repos/${owner}/${repository}/commits/${psha}/${oid}/diff`;  
             axios.get(durl)
-            .then((res)=>{
-                for(var i in res.data.files){
-                
-                    var sam = res.data.files[i].patch.split("\n")
+            .then((json)=>{
+                for(var i in json.data.files){
+                    var sam = json.data.files[i].patch.split("\n")
                     setFiles(files => [...files, sam]);
-                    filename.push(res.data.files[i].filename);
+                    filename.push(json.data.files[i].filename);
                 }
             })
             .catch((e)=>{
@@ -51,8 +49,8 @@ function GetDiff(){
     files = files.slice(0,files.length/2);
     
     return(
-    <html class ="center">
-        <header>
+    <div className ="center">
+        <>
             <div className="left">
 
                 <div className="left">
@@ -72,14 +70,14 @@ function GetDiff(){
                 <p><span className="muted">Parent </span><span className="Link-monospace">{parentid}</span></p>
             </div>
 
-        </header>
+        </>
 
-        <body>
+        <>
             <article>
                 <div>
                     {files.map((file,index) =>(
-                         <><button type="button" class="collapsiblelink" onClick={() => display(index)}>{filename[index]}</button>
-                         <div class="content">
+                         <><button type="button" className="collapsiblelink" onClick={() => display(index)}>{filename[index]}</button>
+                         <div className="content">
                             
                             {file.map(line => (
                             <tr>
@@ -100,24 +98,10 @@ function GetDiff(){
                     ))}
                 </div>
             </article>
-        </body>
+        </>
 
-    </html>
+    </div>
     )
-}
-
-var coll = document.getElementsByClassName("collapsiblelink");
-
-function display(i) {
-  coll[i].addEventListener("click", function() {
-    this.classList.toggle("active");
-    var content = this.nextElementSibling;
-    if (content.style.display === "block") {
-      content.style.display = "none";
-    } else {
-      content.style.display = "block";
-    }
-  });
 }
 
 export default GetDiff

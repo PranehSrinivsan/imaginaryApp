@@ -13,7 +13,6 @@ function GetCommits(){
     var [commitedby,setCommittedby] = useState();
     var [authorname,setAuthorname] = useState();
     var [authorphoto,setAuthorphoto] = useState();
-    var psha;
 
     useEffect( () => {
         axios.get(url)
@@ -22,7 +21,6 @@ function GetCommits(){
             setDays(Math.floor((currdate-Date.parse(json.data.commit.committer.date))/(1000*3600*24)));
             setAuthorname(json.data.commit.author.name);
             setCommittedby(json.data.commit.committer.name);
-            psha = json.data.parents[0].sha;
             setParentid(json.data.parents[0].sha);
             setAuthorphoto(json.data.author.avatar_url);
             setGetCommits(json.data);
@@ -33,8 +31,8 @@ function GetCommits(){
     },[url,oid,owner,parentid,repository])
 
     return(
-        <html class ="center">
-        <header>
+        <div className ="center">
+        <>
             <div className="left">
 
                 <div className="left">
@@ -54,9 +52,9 @@ function GetCommits(){
                 <p><span className="muted">Parent </span><span className="Link-monospace">{parentid}</span></p>
             </div>
 
-        </header>
+        </>
 
-        <body>
+        <>
 
             <article>
                 <pre>
@@ -64,9 +62,9 @@ function GetCommits(){
                 </pre>
             </article>
             
-        </body>
+        </>
 
-    </html>
+    </div>
     )
 }
 
