@@ -1,6 +1,9 @@
 const { default: axios } = require('axios');
 var express = require('express');
+var cors = require('cors')
 var app = express();
+
+app.use(cors)
 
 //get commits
 app.get('/repos/:username/:reponame/commits/:sha', function(req, res) {

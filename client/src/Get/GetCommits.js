@@ -5,7 +5,7 @@ import axios from 'axios';
 function GetCommits(){
 
     const {owner,repository,oid}=useParams();
-    const url=`https://api.github.com/repos/${owner}/${repository}/commits/${oid}`;
+    const url=`http://localhost:8081/repos/${owner}/${repository}/commits/${oid}`;
 
     var [commits, setGetCommits] = useState([]);
     var [days,setDays] = useState();

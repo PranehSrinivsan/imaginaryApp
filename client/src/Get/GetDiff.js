@@ -6,7 +6,7 @@ import { display } from '../commponents/Display'
 function GetDiff(){
 
     const {owner,repository,oid}=useParams();
-    const curl=`https://api.github.com/repos/${owner}/${repository}/commits/${oid}`;
+    const curl=`http://localhost:8081/repos/${owner}/${repository}/commits/${oid}`;
 
     var [days,setDays] = useState();
     var [parentid,setParentid] = useState();
@@ -30,7 +30,7 @@ function GetDiff(){
             setParentid(json.data.parents[0].sha);
             setAuthorphoto(json.data.author.avatar_url);
 
-            const durl = `https://api.github.com/repos/${owner}/${repository}/compare/${psha}...${oid}`;
+            const durl = `http://localhost:8081/repos/${owner}/${repository}/compare/${psha}...${oid}`;
             
             axios.get(durl)
             .then((res)=>{
