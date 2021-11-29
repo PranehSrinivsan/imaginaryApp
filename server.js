@@ -3,10 +3,10 @@ var express = require('express');
 var cors = require('cors')
 var app = express();
 
-app.use(cors)
+app.use(cors())
 
 //get commits
-app.get('/repos/:username/:reponame/commits/:sha', function(req, res) {
+app.get('/repos/:username/:reponame/commits/:sha', (req, res) => {
    var owner = req.params.username;
    var repo = req.params.reponame;
    var oid = req.params.sha;
@@ -24,32 +24,24 @@ app.get('/repos/:username/:reponame/commits/:sha', function(req, res) {
 })
 
 //get diff
- app.get('/repos/:username/:reponame/commits/:sha/diff', function(req, res) {
+ app.get('/repos/:username/:reponame/commits/:parentsha/:sha/diff', (req, res)=>{
    
    var username = req.params.username;
    var repo = req.params.reponame;
+   var psha = req.params.parentsha
    var oid = req.params.sha;
-
-   const curl=`https://api.github.com/repos/${username}/${repo}/commits/${oid}`;//commit url
-
-   axios.get(curl)
-   .then((response)=>{
-
-      var psha = response.data.parents[0].sha;//parent sha
+   
+   const durl=`https://github.com/${username}/${repo}/compare/${psha}...${oid}.diff`;//diff url
       
-      const durl=`https://github.com/${username}/${repo}/compare/${psha}...${oid}.diff`;//diff url
-      
-      axios.get(durl)
-      .then((response)=> {
-         res.json(response.data);
-      })
-      .catch((e)=>{
-         res.send("Error")
-      })
+   axios.get(durl)
+   .then((response)=> {
+      res.json(response.data);
    })
    .catch((e)=>{
       res.send("Error")
    })
 })
 
-app.listen(8081);
+app.listen(8081,()=>{
+   console.log("Running successfully...")
+});

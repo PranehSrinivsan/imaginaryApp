@@ -1,12 +1,13 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router';
-import { display } from '../commponents/Display'
 
 function GetDiff(){
 
     const {owner,repository,oid}=useParams();
-    const curl=`http://localhost:8081/repos/${owner}/${repository}/commits/${oid}`;
+
+    // const curl=`https://api.github.com/repos/${owner}/${repository}/commits/${oid}`;
+    const curl=`/repos/${owner}/${repository}/commits/${oid}`;
 
     var [days,setDays] = useState();
     var [parentid,setParentid] = useState();
@@ -21,7 +22,6 @@ function GetDiff(){
     useEffect( () => {
         axios.get(curl)
         .then((json)=>{
-
             var currdate = new Date();
             setDays(Math.floor((currdate-Date.parse(json.data.commit.committer.date))/(1000*3600*24)));
             setAuthorname(json.data.commit.author.name);
@@ -30,13 +30,13 @@ function GetDiff(){
             setParentid(json.data.parents[0].sha);
             setAuthorphoto(json.data.author.avatar_url);
 
-            const durl = `http://localhost:8081/repos/${owner}/${repository}/compare/${psha}...${oid}`;
+            // const durl = `https://api.github.com/repos/${owner}/${repository}/compare/${psha}...${oid}`;
+            const durl = `/repos/${owner}/${repository}/commits/${psha}/${oid}/diff`;
             
             axios.get(durl)
             .then((res)=>{
-
                 for(var i in res.data.files){
-
+                
                     var sam = res.data.files[i].patch.split("\n")
                     setFiles(files => [...files, sam]);
                     filename.push(res.data.files[i].filename);
@@ -48,7 +48,7 @@ function GetDiff(){
         })
     },[curl,oid,owner,parentid,repository])
 
-    files = files.slice(0,files.length/2);//redusing size to over come double execution  
+    files = files.slice(0,files.length/2);
     
     return(
     <html class ="center">
@@ -78,26 +78,24 @@ function GetDiff(){
             <article>
                 <div>
                     {files.map((file,index) =>(
-                    <>
-                    <button type="button" class="collapsiblelink" onClick={() => display(index)}>{filename[index]}</button>
-                    <div class="content">
-                        <span> {file[0]} </span>
-                        {file.map(line => (
-                        <tr>
-                            <td>
-                                <span>0</span>
-                            </td>
+                         <><button type="button" class="collapsiblelink" onClick={() => display(index)}>{filename[index]}</button>
+                         <div class="content">
+                            
+                            {file.map(line => (
+                            <tr>
+                                <td>
+                                  <span> {file.length}</span>
+                                    </td>
 
-                            <td>
-                               <span> 1  </span>
-                            </td>
-                                
-                            <td>
-                                {line}
-                            </td>
-                        </tr>
-                        ))}
+                                <td>
+                                   <span> 20  </span>
+                                    </td>
+                                <td>
+                                    {line}
+                                </td>
+                                </tr>
 
+                            ))}
                         </div></>
                     ))}
                 </div>
@@ -106,6 +104,20 @@ function GetDiff(){
 
     </html>
     )
+}
+
+var coll = document.getElementsByClassName("collapsiblelink");
+
+function display(i) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
 }
 
 export default GetDiff
