@@ -2,12 +2,13 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router';
 import { display } from '../commponents/Display';
+
 function GetDiff(){
 
     const {owner,repository,oid}=useParams();
 
     // const curl=`https://api.github.com/repos/${owner}/${repository}/commits/${oid}`;
-    const curl=`/repos/${owner}/${repository}/commits/${oid}`;
+    const curl=`http://localhost:8081/repos/${owner}/${repository}/commits/${oid}`;
 
     var [days,setDays] = useState();
     var [parentid,setParentid] = useState();
@@ -20,30 +21,26 @@ function GetDiff(){
     var psha;
 
     useEffect( () => {
-        axios.get(curl)
-        .then((json)=>{
-            var currdate = new Date();
-            setDays(Math.floor((currdate-Date.parse(json.data.commit.committer.date))/(1000*3600*24)));
-            setAuthorname(json.data.commit.author.name);
-            setCommittedby(json.data.commit.committer.name);
-            psha = json.data.parents[0].sha;
-            setParentid(json.data.parents[0].sha);
-            setAuthorphoto(json.data.author.avatar_url);
-
-            // const durl = `https://api.github.com/repos/${owner}/${repository}/compare/${psha}...${oid}`;
-            const durl = `/repos/${owner}/${repository}/commits/${psha}/${oid}/diff`;  
-            axios.get(durl)
-            .then((json)=>{
-                for(var i in json.data.files){
-                    var sam = json.data.files[i].patch.split("\n")
-                    setFiles(files => [...files, sam]);
-                    filename.push(json.data.files[i].filename);
-                }
+        axios.get(`https://api.github.com/users/${owner}`)
+        .then(() =>{
+            axios.get(`https://api.github.com/repos/${owner}/${repository}`)
+            .then(() => {
+                newFunction()
             })
-            .catch((e)=>{
-                console.log("no patch found");
+            
+            .catch((error) => {
+                alert("Ivalid Repository for the given User")
+                // alert("Repository "+error.message)
             })
+        
         })
+        .catch((error) => {
+            alert("Invalid user")
+            // console.log(error)
+            // alert("Invalid User ["+ error.message + "]")
+        })
+
+        
     },[curl,oid,owner,parentid,repository])
 
     files = files.slice(0,files.length/2);
@@ -102,6 +99,59 @@ function GetDiff(){
 
     </div>
     )
+
+
+    function newFunction(){
+        return axios.get(curl)
+            .then((json)=>{
+                 var currdate = new Date();
+                if (json.data){
+                    console.log(json.data)
+                    if(json.data.commit){
+                        if(json.data.commit.comitter){
+                            setDays(Math.floor((currdate-Date.parse(json.data.commit.committer.date))/(1000*3600*24)));
+                            setCommittedby(json.data.commit.committer.name);
+                        }
+                        if(json.data.commit.author){
+                            if(json.data.commit.author.name){
+                                setAuthorname(json.data.commit.author.name);
+                            }
+                        }
+                    }
+                    if(json.data.author){
+                        if(json.data.author.avatar_url){
+                            setAuthorphoto(json.data.author.avatar_url);
+                        }
+                    }
+                    if(json.data.parents){
+                        psha = json.data.parents[0].sha;
+                        setParentid(json.data.parents[0].sha);
+                    }
+                }
+                 
+                 
+                 
+                 
+                 
+     
+                 // const durl = `https://api.github.com/repos/${owner}/${repository}/compare/${psha}...${oid}`;
+                 const durl = `http://localhost:8081/repos/${owner}/${repository}/commits/${psha}/${oid}/diff`;  
+                 axios.get(durl)
+                 .then((json)=>{
+                     for(var i in json.data.files){
+                         var sam = json.data.files[i].patch.split("\n")
+                         setFiles(files => [...files, sam]);
+                         filename.push(json.data.files[i].filename);
+                     }
+                 })
+                 .catch((e)=>{
+                     console.log("no patch found");
+                 })
+             })
+             .catch((error)=>{
+                alert("Incorrect Oid for the given User's Repository");
+            })
+     }
 }
 
 export default GetDiff

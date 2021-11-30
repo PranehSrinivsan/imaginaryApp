@@ -5,7 +5,7 @@ import axios from 'axios';
 function GetCommits(){
 
     const {owner,repository,oid}=useParams();
-    const url=`/repos/${owner}/${repository}/commits/${oid}`;
+    const url=`http://localhost:8081/repos/${owner}/${repository}/commits/${oid}`;
 
     var [commits, setGetCommits] = useState([]);
     var [days,setDays] = useState();
@@ -15,19 +15,27 @@ function GetCommits(){
     var [authorphoto,setAuthorphoto] = useState();
 
     useEffect( () => {
-        axios.get(url)
-        .then((json)=>{
-            var currdate = new Date();
-            setDays(Math.floor((currdate-Date.parse(json.data.commit.committer.date))/(1000*3600*24)));
-            setAuthorname(json.data.commit.author.name);
-            setCommittedby(json.data.commit.committer.name);
-            setParentid(json.data.parents[0].sha);
-            setAuthorphoto(json.data.author.avatar_url);
-            setGetCommits(json.data);
-        })
+        axios.get(`https://api.github.com/users/${owner}`)
+        .then(() =>{
+            axios.get(`https://api.github.com/repos/${owner}/${repository}`)
+            .then(() => {
+                newFunction()
         .catch((error)=>{
-            setGetCommits("Incorrect username /repo /oid");
+           alert("Incorrect Oid for the given User's Repository");
         });
+            })
+            .catch((error) => {
+                alert("Ivalid Repository for the given User")
+                // alert("Repository "+error.message)
+            })
+        
+        })
+        .catch((error) => {
+            alert("Invalid user")
+            // console.log(error)
+            // alert("Invalid User ["+ error.message + "]")
+        })
+
     },[url,oid,owner,parentid,repository])
 
     return(
@@ -66,6 +74,19 @@ function GetCommits(){
 
     </div>
     )
+
+    function newFunction() {
+        return axios.get(url)
+            .then((json) => {
+                var currdate = new Date();
+                setDays(Math.floor((currdate - Date.parse(json.data.commit.committer.date)) / (1000 * 3600 * 24)));
+                setAuthorname(json.data.commit.author.name);
+                setCommittedby(json.data.commit.committer.name);
+                setParentid(json.data.parents[0].sha);
+                setAuthorphoto(json.data.author.avatar_url);
+                setGetCommits(json.data);
+            });
+    }
 }
 
 export default GetCommits
