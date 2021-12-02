@@ -4,6 +4,7 @@ import {
   Route
 } from "react-router-dom"
 import './App.css';
+import Home from "./commponents/Home";
 import GetCommits from './Get/GetCommits'
 import GetDiff from './Get/GetDiff'
 function App() {
@@ -12,6 +13,10 @@ function App() {
       <Router>
         <div className='p'>
           <Switch>
+
+            <Route exact path="/">
+              <Home/>
+            </Route>
 
             <Route exact path="/repo/:owner/:repository/commits/:oid">
               <GetCommits/>
