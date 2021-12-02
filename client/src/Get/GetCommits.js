@@ -20,19 +20,21 @@ function GetCommits(){
             axios.get(`https://api.github.com/repos/${owner}/${repository}`)
             .then(() => {
                 newFunction()
-        .catch((error)=>{
-           alert("Incorrect Oid for the given User's Repository");
-        });
+                .catch((error)=>{
+                    alert("Incorrect Oid for the given User's Repository");
+                    setGetCommits("Incorrect Oid for the given User's Repository")
+                });
             })
             .catch((error) => {
                 alert("Ivalid Repository for the given User")
+                setGetCommits("Ivalid Repository for the given User")
                 // alert("Repository "+error.message)
             })
         
         })
         .catch((error) => {
             alert("Invalid user")
-            // console.log(error)
+            setGetCommits("Invalid user")
             // alert("Invalid User ["+ error.message + "]")
         })
 
