@@ -25,11 +25,13 @@ function GetDiff(){
         .then(() =>{
             axios.get(`https://api.github.com/repos/${owner}/${repository}`)
             .then(() => {
-                newFunction()
-                .catch((error)=>{
-                   // console.log("Incorrect Oid for the given User's Repository")
-                    alert("Incorrect Oid for the given User's Repository");
-                });
+                newFunction((err, result)=> {
+                    // *always* check for err
+                    if (err)
+                        alert("Incorrect Oid for the given User's Repository");
+                    else
+                      console.log ('result', result)
+                })
             })
             .catch((error) => {
                 alert("Ivalid Repository for the given User")
@@ -101,11 +103,11 @@ function GetDiff(){
     </div>
     )
 
-    function newFunction() {
+    function newFunction(done) {
         return axios.get(curl)
         .then((json)=>{
             if (json.data.name === 'Error')
-            console.error('Request failed with status code 422')
+            return done (Error ('Request failed with status code 422'))
         var currdate = new Date();
         checker()
         // const durl = `https://api.github.com/repos/${owner}/${repository}/compare/${psha}...${oid}`;
@@ -119,7 +121,7 @@ function GetDiff(){
                 }
             })
             .catch((e) => {
-                console.error("no patch found");
+                console.log("no patch found");
             });
             function checker() {
                 if (json.data) {
@@ -146,7 +148,7 @@ function GetDiff(){
                     }
                 }
             }
-        })
+        }).catch((err)=>console.error(err))
         
         
     }

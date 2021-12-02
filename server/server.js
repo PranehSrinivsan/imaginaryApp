@@ -13,7 +13,6 @@ app.get('/repos/:username/:reponame/commits/:sha', (req, res) => {
    var oid = req.params.sha;
 
    const curl=`https://api.github.com/repos/${owner}/${repo}/commits/${oid}`;//commit url
-   console.log(curl)
    axios.get(curl)
    .then((response)=> res.json(response.data))
    .catch((e)=> res.send(e))
